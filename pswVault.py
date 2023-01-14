@@ -239,7 +239,7 @@ def vaultScreen():
 
 #   Window layout #######################################
 
-    window.geometry("650x300")
+    window.geometry("700x300")
     window.minsize(650,300)
     window.maxsize(1000,450)
 
@@ -277,7 +277,7 @@ def vaultScreen():
     lbl.grid(row=2, column=1, padx=40)
     lbl = Label(second_frame, text="Password", borderwidth=1, relief="solid", background='grey')
     lbl.grid(row=2, column=2, padx=40)
-    window.geometry("850x300")
+    window.geometry("900x300")
 
     cursor.execute("SELECT * FROM vault")
 
