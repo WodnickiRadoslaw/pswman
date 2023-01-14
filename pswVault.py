@@ -12,6 +12,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.fernet import Fernet
 from passgen import passGenerator
 from update import updateAll 
+from random import randint
 
 
 
@@ -30,7 +31,8 @@ CREATE TABLE IF NOT EXISTS vault(
 id INTEGER PRIMARY KEY,
 platform TEXT NOT NULL,
 account TEXT NOT NULL,
-password TEXT NOT NULL);
+password TEXT NOT NULL,
+notes TEXT NULL);
 """)
 
 #cursor.execute("""
@@ -209,7 +211,30 @@ def vaultScreen():
     def copyPass(input):
         window.clipboard_clear()
         window.clipboard_append(input)
-    
+
+    def makeNotepad(input):
+        window = Tk()
+
+        window.title("Password Generator")
+        window.geometry("400x400")
+
+        # Label frame.
+        lf = LabelFrame(window)
+        lf.pack(pady=50, padx=50)
+
+        # Create Entry Box for number of characters.
+        myEntry = Entry(lf, font=("Calibri", 20))
+        myEntry.pack(ipady=150, ipadx=150)
+        
+
+        # Frame for buttons.
+        myFrame = Frame(window)
+        myFrame.pack(pady=20)
+
+        # Create buttons
+        #myButton = Button(myFrame, text="Generate Password", command=newRand)
+        #myButton.grid(row=0, column=0, padx=10)
+
 
 
 #   Window layout #######################################
@@ -229,11 +254,7 @@ def vaultScreen():
     
     btn2.place(relx=0.4, anchor=CENTER, y=10)
 
-    #lbl = Label(main_frame, text='', height=3)
-    #lbl.grid(row=1, column=0)
-
     btn = Button(main_frame, text="Store New", command=addEntry)
-    #btn.grid(row=1)
     btn.place(relx=0.6, anchor=CENTER, y=10)
 
     #creating a line
@@ -247,16 +268,14 @@ def vaultScreen():
     my_canvas.bind('<Configure>', lambda e: my_canvas.configure(scrollregion=my_canvas.bbox("all")))
 
     second_frame = Frame(my_canvas)
-
     my_canvas.create_window((0, 30), window=second_frame, anchor="nw")
 
-   
 
-    lbl = Label(second_frame, text="Platform", borderwidth=1, relief="solid", background='black')
+    lbl = Label(second_frame, text="Platform", borderwidth=1, relief="solid", background='grey')
     lbl.grid(row=2, column=0, padx=40)
-    lbl = Label(second_frame, text="Account", borderwidth=1, relief="solid", background='black')
+    lbl = Label(second_frame, text="Account", borderwidth=1, relief="solid", background='grey')
     lbl.grid(row=2, column=1, padx=40)
-    lbl = Label(second_frame, text="Password", borderwidth=1, relief="solid", background='black')
+    lbl = Label(second_frame, text="Password", borderwidth=1, relief="solid", background='grey')
     lbl.grid(row=2, column=2, padx=40)
     window.geometry("850x300")
 
@@ -285,6 +304,8 @@ def vaultScreen():
             btn1.grid(column=5, row=i + 3, pady=10)
             btn = Button(second_frame, text="Delete", command=partial(removeEntry, array[i][0]))
             btn.grid(column=6, row=i + 3, pady=10)
+            btn4 = Button(second_frame, text="Notepad", command=partial(makeNotepad, array[i][0]))
+            btn4.grid(column=7, row=i + 3, pady=10)
 
             i = i + 1
 
