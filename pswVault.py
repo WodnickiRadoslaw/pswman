@@ -13,6 +13,7 @@ from cryptography.fernet import Fernet
 from passgen import passGenerator
 from update import updateAll 
 from random import randint
+from tkinter import filedialog
 
 
 
@@ -35,12 +36,13 @@ password TEXT NOT NULL,
 notes TEXT NULL);
 """)
 
+# Drop table vault ####################################################
 #cursor.execute("""
 #DROP TABLE vault;
 #""")
 
 
-# Create PopUp
+# Create PopUp #########################################################
 def popUp(text):
     answer = simpledialog.askstring("input string", text)
     return answer
@@ -94,9 +96,7 @@ def firstTimeScreen():
     btn = Button(window, text="Save", command=savePassword)
     btn.pack(pady=5)
 
-#   Login screen #######################################
-
-
+#   Login screen #######################################################
 def loginScreen():
     window.geometry("250x100")
 
@@ -130,7 +130,7 @@ def loginScreen():
     btn = Button(window, text="Submit", command=checkPassword)
     btn.pack(pady=5)
 
-#   Vault functionalities #######################################
+#   Vault functionalities #################################################
 
 
 def vaultScreen():
@@ -156,7 +156,7 @@ def vaultScreen():
 
     # Create buttons
 
-
+# Updating an entry (password, account and platform) #######################
     def updateEntry(input):
         window = Tk()
         window.geometry("550x100")
@@ -165,16 +165,19 @@ def vaultScreen():
         myFrame = Frame(window)
         myFrame.pack(pady=20)
 
+        #update password button
         myButton = Button(myFrame, text="Update password", command=partial(passwordChange, input))
         myButton.grid(row=0, column=2, padx=10)
 
+        #update account button
         myButton = Button(myFrame, text="Update account", command=partial(accountChange, input))
         myButton.grid(row=0, column=1, padx=10)
 
+        #update platform button
         myButton = Button(myFrame, text="Update platform", command=partial(platformChange, input))
         myButton.grid(row=0, column=0, padx=10)
 
-
+    # Change password function
     def passwordChange(input):
         update = "Type new password"
         password = popUp(update)
@@ -183,6 +186,7 @@ def vaultScreen():
         db.commit()
         vaultScreen()
 
+    # Change account function
     def accountChange(input):
         update = "Type new account"
         account = popUp(update)
@@ -190,7 +194,8 @@ def vaultScreen():
         cursor.execute("UPDATE vault SET account = ? WHERE id = ?", (account, input,))
         db.commit()
         vaultScreen()
-    
+
+    # Change platform function
     def platformChange(input):
         update = "Type new platform"
         platform = popUp(update)
@@ -199,19 +204,23 @@ def vaultScreen():
         db.commit()
         vaultScreen()
 
+    # Remove entry function
     def removeEntry(input):
         cursor.execute("DELETE FROM vault WHERE id = ?", (input,))
         db.commit()
         vaultScreen()
 
+    # Copy account function
     def copyAcc(input):
         window.clipboard_clear()
         window.clipboard_append(input)
 
+    # Copy password function
     def copyPass(input):
         window.clipboard_clear()
         window.clipboard_append(input)
 
+    # Creating a notepad
     def makeNotepad(input):
         window = Tk()
 
@@ -231,14 +240,8 @@ def vaultScreen():
         myFrame = Frame(window)
         myFrame.pack(pady=20)
 
-        # Create buttons
-        #myButton = Button(myFrame, text="Generate Password", command=newRand)
-        #myButton.grid(row=0, column=0, padx=10)
 
-
-
-#   Window layout #######################################
-
+#   Window layout ###############################################
     window.geometry("700x300")
     window.minsize(650,300)
     window.maxsize(1000,450)
@@ -270,7 +273,7 @@ def vaultScreen():
     second_frame = Frame(my_canvas)
     my_canvas.create_window((0, 30), window=second_frame, anchor="nw")
 
-
+    # Creating labels in second_frame
     lbl = Label(second_frame, text="Platform", borderwidth=1, relief="solid", background='grey')
     lbl.grid(row=2, column=0, padx=40)
     lbl = Label(second_frame, text="Account", borderwidth=1, relief="solid", background='grey')
@@ -282,7 +285,6 @@ def vaultScreen():
     cursor.execute("SELECT * FROM vault")
 
 #   Buttons Layout #######################################
-
     if cursor.fetchall() is not None:
         i = 0
         while True:
@@ -299,7 +301,6 @@ def vaultScreen():
             btn2.grid(column=3, row=i + 3, pady=10)
             btn3 = Button(second_frame, text="Copy Pass", command=partial(copyPass, array[i][3]))
             btn3.grid(column=4, row=i + 3, pady=10)
-            #btn1 = Button(second_frame, text="Update", command=updateAll)
             btn1 = Button(second_frame, text="Update", command=partial(updateEntry, array[i][0]))
             btn1.grid(column=5, row=i + 3, pady=10)
             btn = Button(second_frame, text="Delete", command=partial(removeEntry, array[i][0]))
