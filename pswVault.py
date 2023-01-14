@@ -166,10 +166,10 @@ def vaultScreen():
         myButton = Button(myFrame, text="Update password", command=partial(passwordChange, input))
         myButton.grid(row=0, column=2, padx=10)
 
-        myButton = Button(myFrame, text="Update account")
+        myButton = Button(myFrame, text="Update account", command=partial(accountChange, input))
         myButton.grid(row=0, column=1, padx=10)
 
-        myButton = Button(myFrame, text="Update platform")
+        myButton = Button(myFrame, text="Update platform", command=partial(platformChange, input))
         myButton.grid(row=0, column=0, padx=10)
 
 
@@ -178,6 +178,22 @@ def vaultScreen():
         password = popUp(update)
 
         cursor.execute("UPDATE vault SET password = ? WHERE id = ?", (password, input,))
+        db.commit()
+        vaultScreen()
+
+    def accountChange(input):
+        update = "Type new account"
+        account = popUp(update)
+
+        cursor.execute("UPDATE vault SET account = ? WHERE id = ?", (account, input,))
+        db.commit()
+        vaultScreen()
+    
+    def platformChange(input):
+        update = "Type new platform"
+        platform = popUp(update)
+
+        cursor.execute("UPDATE vault SET platform = ? WHERE id = ?", (platform, input,))
         db.commit()
         vaultScreen()
 
