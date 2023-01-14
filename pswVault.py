@@ -11,8 +11,6 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.backends import default_backend
 from cryptography.fernet import Fernet
 from passgen import passGenerator
-from update import updateAll 
-from random import randint
 from tkinter import filedialog
 
 
