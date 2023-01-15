@@ -12,6 +12,8 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.fernet import Fernet
 from passgen import passGenerator
 from tkinter import filedialog
+import tkinter as tk
+
 
 
 
@@ -42,7 +44,7 @@ notes TEXT NULL);
 
 # Create PopUp #########################################################
 def popUp(text):
-    answer = simpledialog.askstring("input string", text)
+    answer = simpledialog.askstring("Insert data", text)
     return answer
 
 
@@ -220,23 +222,44 @@ def vaultScreen():
 
     # Creating a notepad
     def makeNotepad(input):
-        window = Tk()
+        window = tk.Tk()
+        window.title("Notepad")
+        #window.geometry("300x300")
+        
+        text = tk.Text(window, height=8, width=40)
+        scroll = tk.Scrollbar(window)
+        text.configure(yscrollcommand=scroll.set)
+        text.pack(side=tk.LEFT)
+        
+        scroll.config(command=text.yview)
+        scroll.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        #TODO
+        #insert_text = """text for test"""
+        insert_text = """INSERT INTO notes(input)
+            VALUES(?) """
+        cursor.execute(insert_text, (input))
+        db.commit()
+        vaultScreen()
+        
+        text.insert(tk.END, insert_text)
+        tk.mainloop()
 
-        window.title("Password Generator")
-        window.geometry("400x400")
-
+        # Creating a button
+        #TODO
+    
         # Label frame.
-        lf = LabelFrame(window)
-        lf.pack(pady=50, padx=50)
+        #lf = LabelFrame(window)
+        #lf.pack(pady=50, padx=50)
 
         # Create Entry Box for number of characters.
-        myEntry = Entry(lf, font=("Calibri", 20))
-        myEntry.pack(ipady=150, ipadx=150)
+        #myEntry = Entry(lf, font=("Calibri", 20))
+        #myEntry.pack(ipady=150, ipadx=150)
         
 
         # Frame for buttons.
-        myFrame = Frame(window)
-        myFrame.pack(pady=20)
+        #myFrame = Frame(window)
+        #myFrame.pack(pady=20)
 
 
 #   Window layout ###############################################
