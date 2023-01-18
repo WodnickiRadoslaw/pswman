@@ -15,6 +15,7 @@ from tkinter import filedialog
 import tkinter as tk
 
 
+#TODO zrobic hashowanie tabeli w sql
 
 
 # tworzenie noego masterpassword - identyfikacja 
@@ -314,9 +315,9 @@ def vaultScreen():
 
             lbl1 = Label(second_frame, text=(array[i][1][0 : 10]))
             lbl1.grid(column=0, row=i + 3)
-            lbl2 = Label(second_frame, text=(array[i][2][0 : 10]))
+            lbl2 = Label(second_frame, text=(array[i][2][0 : 15]))
             lbl2.grid(column=1, row=i + 3)
-            lbl3 = Label(second_frame, text="*****")
+            lbl3 = Label(second_frame, text="*****") 
             lbl3.grid(column=2, row=i + 3)
             btn2 = Button(second_frame, text="Copy Acc", command=partial(copyAcc, array[i][2]))
             btn2.grid(column=3, row=i + 3, pady=10)
