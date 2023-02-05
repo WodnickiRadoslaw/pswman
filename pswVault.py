@@ -57,7 +57,7 @@ window.title("Password Manager")
 
 
 def hashPassword(input):
-    hash1 = hashlib.md5(input)
+    hash1 = hashlib.sha256(input) #hashowanie sha256/ zmiana na md5 powoduje hashowanie w md5 - biblioteka hashlib
     hash1 = hash1.hexdigest()
 
     return hash1
@@ -112,11 +112,13 @@ def loginScreen():
     lbl1 = Label(window)
     lbl1.pack()
 
-    def getMasterPassword():
+    def getMasterPassword(): #hashowanie MD5
         checkhashedpassword = hashPassword(txt.get().encode("utf-8"))
         cursor.execute("SELECT * FROM masterpassword WHERE id = 1 AND password = ?", [checkhashedpassword])
 
+        print(checkhashedpassword)
         return cursor.fetchall()
+
 
     def checkPassword():
         password = getMasterPassword()
@@ -129,7 +131,7 @@ def loginScreen():
             lbl1.config(text="Wrong Password")
 
     btn = Button(window, text="Submit", command=checkPassword)
-    btn.pack(pady=5)
+    btn.pack(pady=2)
 
 #   Vault functionalities #################################################
 
