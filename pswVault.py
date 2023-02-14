@@ -13,12 +13,9 @@ from cryptography.fernet import Fernet
 from passgen import passGenerator
 from tkinter import filedialog
 import tkinter as tk
+from Crypto.Cipher import AES
 
-
-#TODO zrobic hashowanie tabeli w sql
-
-
-# tworzenie noego masterpassword - identyfikacja 
+# Creating new masterpassword - user identification ####################
 with sqlite3.connect("dbMain.db") as db:
     cursor = db.cursor()
 
@@ -34,7 +31,7 @@ id INTEGER PRIMARY KEY,
 platform TEXT NOT NULL,
 account TEXT NOT NULL,
 password TEXT NOT NULL,
-notes TEXT NULL);
+notes TEXT NOT NULL);
 """)
 
 # Drop table vault ####################################################
@@ -49,7 +46,7 @@ def popUp(text):
     return answer
 
 
-# Initiate Window
+# Initiate Window ######################################################
 window = Tk()
 window.update()
 
@@ -57,9 +54,8 @@ window.title("Password Manager")
 
 
 def hashPassword(input):
-    hash1 = hashlib.sha256(input) #hashowanie sha256/ zmiana na md5 powoduje hashowanie w md5 - biblioteka hashlib
+    hash1 = hashlib.sha256(input)#hashing sha256 
     hash1 = hash1.hexdigest()
-
     return hash1
 
 #   Set up master password screen #######################################
@@ -81,6 +77,7 @@ def firstTimeScreen():
     txt1 = Entry(window, width=20, show="*")
     txt1.pack()
 
+#   Hashing the masterpassword function ##################################
     def savePassword():
         if txt.get() == txt1.get():
             hashedPassword = hashPassword(txt.get().encode('utf-8'))
@@ -112,7 +109,7 @@ def loginScreen():
     lbl1 = Label(window)
     lbl1.pack()
 
-    def getMasterPassword(): #hashowanie MD5
+    def getMasterPassword(): 
         checkhashedpassword = hashPassword(txt.get().encode("utf-8"))
         cursor.execute("SELECT * FROM masterpassword WHERE id = 1 AND password = ?", [checkhashedpassword])
 
@@ -133,9 +130,7 @@ def loginScreen():
     btn = Button(window, text="Submit", command=checkPassword)
     btn.pack(pady=2)
 
-#   Vault functionalities #################################################
-
-
+#   Main functionalities - creating main screen #############################
 def vaultScreen():
     for widget in window.winfo_children():  
         widget.destroy()
@@ -144,22 +139,29 @@ def vaultScreen():
         text1 = "Platform"
         text2 = "Account"
         text3 = "Password"
+        text4 = "Notes"
 
         platform = popUp(text1)
         account = popUp(text2)
         password = popUp(text3)
+        #password1 = hashlib.sha256(password.encode('utf-8')).hexdigest()
+        
+        notes = popUp(text4).format(42)
+        print(notes, text4)
 
-        insert_fields = """INSERT INTO vault(platform, account, password)
-        VALUES(?, ?, ?)"""
+        insert_fields = """INSERT INTO vault(platform, account, password, notes)
+        VALUES(?, ?, ?, ?)"""
 
-        cursor.execute(insert_fields, (platform, account, password))
+        if notes=="":
+            notes = notes.format(42)
+        cursor.execute(insert_fields, (platform, account, password, notes))
         db.commit()
         vaultScreen()
     
 
     # Create buttons
 
-# Updating an entry (password, account and platform) #######################
+# Updating entries (password, account and platform) #######################
     def updateEntry(input):
         window = Tk()
         window.geometry("550x100")
@@ -168,19 +170,19 @@ def vaultScreen():
         myFrame = Frame(window)
         myFrame.pack(pady=20)
 
-        #update password button
+        #Update password button
         myButton = Button(myFrame, text="Update password", command=partial(passwordChange, input))
         myButton.grid(row=0, column=2, padx=10)
 
-        #update account button
+        #Update account button
         myButton = Button(myFrame, text="Update account", command=partial(accountChange, input))
         myButton.grid(row=0, column=1, padx=10)
 
-        #update platform button
+        #Update platform button
         myButton = Button(myFrame, text="Update platform", command=partial(platformChange, input))
         myButton.grid(row=0, column=0, padx=10)
 
-    # Change password function
+    # Change password #########################################################
     def passwordChange(input):
         update = "Type new password"
         password = popUp(update)
@@ -189,7 +191,7 @@ def vaultScreen():
         db.commit()
         vaultScreen()
 
-    # Change account function
+    # Change account #########################################################
     def accountChange(input):
         update = "Type new account"
         account = popUp(update)
@@ -198,7 +200,7 @@ def vaultScreen():
         db.commit()
         vaultScreen()
 
-    # Change platform function
+    # Change platform ########################################################
     def platformChange(input):
         update = "Type new platform"
         platform = popUp(update)
@@ -207,65 +209,64 @@ def vaultScreen():
         db.commit()
         vaultScreen()
 
-    # Remove entry function
+    # Remove data ###########################################################
     def removeEntry(input):
         cursor.execute("DELETE FROM vault WHERE id = ?", (input,))
         db.commit()
         vaultScreen()
 
-    # Copy account function
+    # Copy account ##########################################################
     def copyAcc(input):
         window.clipboard_clear()
         window.clipboard_append(input)
 
-    # Copy password function
+    # Copy password #########################################################
     def copyPass(input):
         window.clipboard_clear()
         window.clipboard_append(input)
+        
 
-    # Creating a notepad
+    # Creating a notepad ####################################################
     def makeNotepad(input):
-        window = tk.Tk()
-        window.title("Notepad")
-        #window.geometry("300x300")
+
+        root = Tk()
+        root.title("Notepad")
+        root.geometry("350x200")
         
-        text = tk.Text(window, height=8, width=40)
-        scroll = tk.Scrollbar(window)
-        text.configure(yscrollcommand=scroll.set)
-        text.pack(side=tk.LEFT)
+        # Create text widget, with size #####################################
+        T = Text(root, height = 10, width = 52)
+        inputValue=T.get("1.0",END)
         
-        scroll.config(command=text.yview)
-        scroll.pack(side=tk.RIGHT, fill=tk.Y)
+        # Reading the data from DB ##########################################
+        Fact = cursor.execute("SELECT notes FROM vault WHERE id = ?", (input,))
+        Fact = cursor.fetchone()
         
-        #TODO
-        #insert_text = """text for test"""
-        insert_text = """INSERT INTO notes(input)
-            VALUES(?) """
-        cursor.execute(insert_text, (input))
-        db.commit()
-        vaultScreen()
+        # Updating the data to DB ###########################################
+        def retrieve_input(input):
+            note = T.get("1.0",'end-1c').format(42)
+            #note = str(T.get("1.0",'end-1c'))
+            Fact=cursor.execute("UPDATE vault SET notes = ? WHERE id = ?", (note, input,))
+            Fact=cursor.fetchone()
+            db.commit()
+
         
-        text.insert(tk.END, insert_text)
+        # Create button for save data #######################################
+        b1 = Button(root, text = "Save", command=partial(retrieve_input, input))
+
+        
+        # Exit button #######################################################
+        b2 = Button(root, text = "Exit",
+                    command = root.destroy)
+        
+        T.pack()
+        b1.pack()
+        b2.pack()
+        
+        
+        T.insert(tk.END, Fact)
         tk.mainloop()
 
-        # Creating a button
-        #TODO
-    
-        # Label frame.
-        #lf = LabelFrame(window)
-        #lf.pack(pady=50, padx=50)
-
-        # Create Entry Box for number of characters.
-        #myEntry = Entry(lf, font=("Calibri", 20))
-        #myEntry.pack(ipady=150, ipadx=150)
-        
-
-        # Frame for buttons.
-        #myFrame = Frame(window)
-        #myFrame.pack(pady=20)
-
-
-#   Window layout ###############################################
+#   Window layout ###########################################################
     window.geometry("700x300")
     window.minsize(650,300)
     window.maxsize(1000,450)
@@ -276,7 +277,7 @@ def vaultScreen():
     my_canvas = Canvas(main_frame)
     my_canvas.pack(side=LEFT, fill=BOTH, expand=1)
 
-    #text in main frame
+    # Buttons in mainframe #################################################
     btn2 = Button(main_frame, text="Generate Password", command=passGenerator)
     
     btn2.place(relx=0.4, anchor=CENTER, y=10)
@@ -284,7 +285,7 @@ def vaultScreen():
     btn = Button(main_frame, text="Store New", command=addEntry)
     btn.place(relx=0.6, anchor=CENTER, y=10)
 
-    #creating a line
+    # Creating a line ######################################################
     my_canvas.pack(fill=BOTH, expand=1)
     my_canvas.create_line(200000, 120, 0, 25, fill="black")
 
@@ -297,7 +298,7 @@ def vaultScreen():
     second_frame = Frame(my_canvas)
     my_canvas.create_window((0, 30), window=second_frame, anchor="nw")
 
-    # Creating labels in second_frame
+    # Creating labels in secondframe ########################################
     lbl = Label(second_frame, text="Platform", borderwidth=1, relief="solid", background='grey')
     lbl.grid(row=2, column=0, padx=40)
     lbl = Label(second_frame, text="Account", borderwidth=1, relief="solid", background='grey')
@@ -308,7 +309,7 @@ def vaultScreen():
 
     cursor.execute("SELECT * FROM vault")
 
-#   Buttons Layout #######################################
+#   Buttons Layout ##########################################################
     if cursor.fetchall() is not None:
         i = 0
         while True:
@@ -338,7 +339,7 @@ def vaultScreen():
             if len(cursor.fetchall()) <= i:
                 break
 
-
+# Implemeting all the data to DB ############################################
 cursor.execute("SELECT * FROM masterpassword")
 if cursor.fetchall():
     loginScreen()
