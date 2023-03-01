@@ -51,6 +51,7 @@ def passGenerator():
             myPass += chr(randint(33, 126))
 
         pwEntry.insert(0, myPass)
+        
 
     def clipper():
         window.clipboard_clear()
@@ -73,11 +74,11 @@ def passGenerator():
     myFrame = Frame(window)
     myFrame.pack(pady=20)
 
-
-
     # Create buttons
     myButton = Button(myFrame, text="Generate Password", command=newRand)
     myButton.grid(row=0, column=0, padx=10)
+
+
 
     clipBtn = Button(myFrame, text="Copy to Clipboard", command=clipper)
     clipBtn.grid(row=0, column=1, padx=10)

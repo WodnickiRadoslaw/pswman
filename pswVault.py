@@ -15,6 +15,9 @@ from tkinter import filedialog
 import tkinter as tk
 from Crypto.Cipher import AES
 
+
+
+
 # Creating new masterpassword - user identification ####################
 with sqlite3.connect("dbMain.db") as db:
     cursor = db.cursor()
@@ -24,6 +27,7 @@ CREATE TABLE IF NOT EXISTS masterpassword(
 id INTEGER PRIMARY KEY,
 password TEXT NOT NULL);
 """)
+
 
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS vault(
