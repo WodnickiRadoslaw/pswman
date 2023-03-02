@@ -31,6 +31,7 @@ def clipper():
     window2.clipboard_clear()
     window2.clipboard_append(entry.get())
 
+# creating an alphabet to create the base for password generator    
 def passwordGen(letter, numbers, specials, long) : 
     if letter == 0 :
         letter = ""
@@ -48,8 +49,10 @@ def passwordGen(letter, numbers, specials, long) :
     password = ''.join(secrets.choice(alphabet) for i in range(long))
     return password
     
+# Printing a password in terminal - checking the compatibility
 print(passwordGen(1, 0, 0, 10))
 
+# Creating a window
 window2 = Tk()
 window2.title("Password generator")
 window2.geometry('400x250')
@@ -57,7 +60,6 @@ window2.minsize(400, 250)
 window2.maxsize(500, 300)
 
 window2.config(background= '#3D3D3D')
-
 frame = Frame(window2, bg = '#3D3D3D')
 
 # Title window2
@@ -72,14 +74,17 @@ caseCheck1 = IntVar()
 case = Checkbutton(frame, text="letters",variable = caseCheck1 ,font=("Calibri", 15), offvalue=0, onvalue=1)
 case.pack()
 
+# Option of digits in password
 caseCheck2 = IntVar()
 case1 = Checkbutton(frame, text="digits",variable = caseCheck2 ,font=("Calibri", 15), offvalue=0, onvalue=1)
 case1.pack()
 
+# Option of special signs in password
 caseCheck3 = IntVar()
 case2 = Checkbutton(frame, text="special signs",variable = caseCheck3 ,font=("Calibri", 15), offvalue=0, onvalue=1)
 case2.pack()
 
+# Final button to generate the password, it reports to rep()
 button = Button(frame, text = "Generate password", font=("Calibri", 15), bg = '#3D3D3D', fg ='#000000', command = rep)                       
 button.pack(fill=Y) 
 

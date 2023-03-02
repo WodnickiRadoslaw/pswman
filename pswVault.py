@@ -15,17 +15,6 @@ from tkinter import filedialog
 import tkinter as tk
 from Crypto.Cipher import AES
 
-import secrets
-import string
-import subprocess
-import sys
-if sys.version_info[0] == 3:
-    import tkinter as tk
-else:
-    import Tkinter as tk
-
-
-
 # Creating new masterpassword - user identification ####################
 with sqlite3.connect("dbMain.db") as db:
     cursor = db.cursor()
@@ -35,7 +24,6 @@ CREATE TABLE IF NOT EXISTS masterpassword(
 id INTEGER PRIMARY KEY,
 password TEXT NOT NULL);
 """)
-
 
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS vault(
@@ -51,19 +39,15 @@ notes TEXT NOT NULL);
 #DROP TABLE vault;
 #""")
 
-
 # Create PopUp #########################################################
 def popUp(text):
     answer = simpledialog.askstring("Insert data", text)
     return answer
 
-
 # Initiate Window ######################################################
 window = Tk()
 window.update()
-
 window.title("Password Manager")
-
 
 def hashPassword(input):
     hash1 = hashlib.sha256(input)#hashing sha256 
@@ -104,8 +88,6 @@ def firstTimeScreen():
     btn = Button(window, text="Save", command=savePassword)
     btn.pack(pady=5)
 
-
-
 #   Login screen #######################################################
 def loginScreen():
     window.geometry("250x100")
@@ -124,17 +106,14 @@ def loginScreen():
     def getMasterPassword(): 
         checkhashedpassword = hashPassword(txt.get().encode("utf-8"))
         cursor.execute("SELECT * FROM masterpassword WHERE id = 1 AND password = ?", [checkhashedpassword])
-
         print(checkhashedpassword)
         return cursor.fetchall()
-
 
     def checkPassword():
         password = getMasterPassword()
 
         if password:
             vaultScreen()
-
         else:
             txt.delete(0, 'end')
             lbl1.config(text="Wrong Password")
@@ -156,7 +135,6 @@ def vaultScreen():
         platform = popUp(text1)
         account = popUp(text2)
         password = popUp(text3)
-        #password1 = hashlib.sha256(password.encode('utf-8')).hexdigest()
         
         notes = popUp(text4).format(42)
         print(notes, text4)
@@ -169,9 +147,6 @@ def vaultScreen():
         cursor.execute(insert_fields, (platform, account, password, notes))
         db.commit()
         vaultScreen()
-    
-
-    # Create buttons
 
 # Updating entries (password, account and platform) #######################
     def updateEntry(input):
@@ -237,10 +212,8 @@ def vaultScreen():
         window.clipboard_clear()
         window.clipboard_append(input)
         
-
     # Creating a notepad ####################################################
     def makeNotepad(input):
-
         root = Tk()
         root.title("Notepad")
         root.geometry("350x200")
@@ -261,11 +234,9 @@ def vaultScreen():
             Fact=cursor.fetchone()
             db.commit()
 
-        
         # Create button for save data #######################################
         b1 = Button(root, text = "Save", command=partial(retrieve_input, input))
 
-        
         # Exit button #######################################################
         b2 = Button(root, text = "Exit",
                     command = root.destroy)
@@ -274,11 +245,8 @@ def vaultScreen():
         b1.pack()
         b2.pack()
         
-        
         T.insert(tk.END, Fact)
         tk.mainloop()
-
-
 
 #   Window layout ###########################################################
     window.geometry("700x300")
@@ -294,10 +262,8 @@ def vaultScreen():
     # Buttons in mainframe #################################################
     def run_program():
         os.system('python3 passwordgenerator.py')
-    btn2 = Button(main_frame, text="Generate Password", command=run_program)
-    
 
-    
+    btn2 = Button(main_frame, text="Generate Password", command=run_program)
     btn2.place(relx=0.4, anchor=CENTER, y=10)
 
     btn = Button(main_frame, text="Store New", command=addEntry)
@@ -317,14 +283,13 @@ def vaultScreen():
     my_canvas.create_window((0, 30), window=second_frame, anchor="nw")
 
     # Creating labels in secondframe ########################################
-    lbl = Label(second_frame, text="Platform", borderwidth=1, relief="solid", background='grey')
+    lbl = Label(second_frame, text="Platform", font='Calibri 15 bold underline', borderwidth=0, relief="solid")
     lbl.grid(row=2, column=0, padx=40)
-    lbl = Label(second_frame, text="Account", borderwidth=1, relief="solid", background='grey')
+    lbl = Label(second_frame, text="Account", font='Calibri 15 bold underline', borderwidth=0, relief="solid")
     lbl.grid(row=2, column=1, padx=40)
-    lbl = Label(second_frame, text="Password", borderwidth=1, relief="solid", background='grey')
+    lbl = Label(second_frame, text="Password", font='Calibri 15 bold underline',borderwidth=0, relief="solid")
     lbl.grid(row=2, column=2, padx=40)
     window.geometry("900x300")
-
     cursor.execute("SELECT * FROM vault")
 
 #   Buttons Layout ##########################################################
