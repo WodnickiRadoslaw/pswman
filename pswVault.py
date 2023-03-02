@@ -271,7 +271,7 @@ def vaultScreen():
 
     # Creating a line ######################################################
     my_canvas.pack(fill=BOTH, expand=1)
-    my_canvas.create_line(200000, 120, 0, 25, fill="black")
+    my_canvas.create_line(200000, 120, 0, 23.5, fill="black")
 
     my_scrollbar = ttk.Scrollbar(main_frame, orient=VERTICAL, command=my_canvas.yview)
     my_scrollbar.pack(side=RIGHT, fill=Y)
