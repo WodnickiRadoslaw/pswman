@@ -15,6 +15,14 @@ from tkinter import filedialog
 import tkinter as tk
 from Crypto.Cipher import AES
 
+import secrets
+import string
+import subprocess
+import sys
+if sys.version_info[0] == 3:
+    import tkinter as tk
+else:
+    import Tkinter as tk
 
 
 
@@ -85,18 +93,18 @@ def firstTimeScreen():
     def savePassword():
         if txt.get() == txt1.get():
             hashedPassword = hashPassword(txt.get().encode('utf-8'))
-
             insert_password = """INSERT INTO masterpassword(password)
             VALUES(?) """
             cursor.execute(insert_password, [hashedPassword])
             db.commit()
             vaultScreen()
-
         else:
             lbl.config(text="Passwords don't match")
 
     btn = Button(window, text="Save", command=savePassword)
     btn.pack(pady=5)
+
+
 
 #   Login screen #######################################################
 def loginScreen():
@@ -270,6 +278,8 @@ def vaultScreen():
         T.insert(tk.END, Fact)
         tk.mainloop()
 
+
+
 #   Window layout ###########################################################
     window.geometry("700x300")
     window.minsize(650,300)
@@ -282,7 +292,11 @@ def vaultScreen():
     my_canvas.pack(side=LEFT, fill=BOTH, expand=1)
 
     # Buttons in mainframe #################################################
-    btn2 = Button(main_frame, text="Generate Password", command=passGenerator)
+    def run_program():
+        os.system('python3 passwordgenerator.py')
+    btn2 = Button(main_frame, text="Generate Password", command=run_program)
+    
+
     
     btn2.place(relx=0.4, anchor=CENTER, y=10)
 
