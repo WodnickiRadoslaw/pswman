@@ -1,20 +1,15 @@
+import os
 import hashlib
 import sqlite3
 from functools import partial
 from tkinter import *
 from tkinter import simpledialog
 from tkinter import ttk
-import base64
-import os
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from cryptography.hazmat.backends import default_backend
-from cryptography.fernet import Fernet
-from passgen import passGenerator
-from tkinter import filedialog
 import tkinter as tk
-from Crypto.Cipher import AES
 
+from passwordDBencrypting import password_encrypt, password_decrypt
+
+CopyAcc = 'Copy acc'
 # Creating new masterpassword - user identification ####################
 with sqlite3.connect("dbMain.db") as db:
     cursor = db.cursor()
@@ -30,7 +25,7 @@ CREATE TABLE IF NOT EXISTS vault(
 id INTEGER PRIMARY KEY,
 platform TEXT NOT NULL,
 account TEXT NOT NULL,
-password TEXT NOT NULL,
+password VARCHAR(255) NOT NULL,
 notes TEXT NOT NULL);
 """)
 
@@ -106,7 +101,6 @@ def loginScreen():
     def getMasterPassword(): 
         checkhashedpassword = hashPassword(txt.get().encode("utf-8"))
         cursor.execute("SELECT * FROM masterpassword WHERE id = 1 AND password = ?", [checkhashedpassword])
-        print(checkhashedpassword)
         return cursor.fetchall()
 
     def checkPassword():
@@ -121,6 +115,8 @@ def loginScreen():
     btn = Button(window, text="Submit", command=checkPassword)
     btn.pack(pady=2)
 
+
+password_to_encrypt = """SELECT password FROM masterpassword WHERE id = 1"""
 #   Main functionalities - creating main screen #############################
 def vaultScreen():
     for widget in window.winfo_children():  
@@ -135,16 +131,19 @@ def vaultScreen():
         platform = popUp(text1)
         account = popUp(text2)
         password = popUp(text3)
+
+        message = password
+        password_to_encrypt = """SELECT password FROM masterpassword WHERE id = 1"""
+        encryptedPassword = password_encrypt(message.encode(), password_to_encrypt)
         
         notes = popUp(text4).format(42)
-        print(notes, text4)
 
         insert_fields = """INSERT INTO vault(platform, account, password, notes)
         VALUES(?, ?, ?, ?)"""
 
         if notes=="":
             notes = notes.format(42)
-        cursor.execute(insert_fields, (platform, account, password, notes))
+        cursor.execute(insert_fields, (platform, account, encryptedPassword, notes))
         db.commit()
         vaultScreen()
 
@@ -158,6 +157,7 @@ def vaultScreen():
         myFrame.pack(pady=20)
 
         #Update password button
+        # encrypt
         myButton = Button(myFrame, text="Update password", command=partial(passwordChange, input))
         myButton.grid(row=0, column=2, padx=10)
 
@@ -174,7 +174,11 @@ def vaultScreen():
         update = "Type new password"
         password = popUp(update)
 
-        cursor.execute("UPDATE vault SET password = ? WHERE id = ?", (password, input,))
+        message = password
+        password_to_encrypt = """SELECT password FROM masterpassword WHERE id = 1"""
+        encryptedPassword = password_encrypt(message.encode(), password_to_encrypt)
+
+        cursor.execute("UPDATE vault SET password = ? WHERE id = ?", (encryptedPassword, input,))
         db.commit()
         vaultScreen()
 
@@ -206,11 +210,38 @@ def vaultScreen():
     def copyAcc(input):
         window.clipboard_clear()
         window.clipboard_append(input)
+        window2 = Tk()
+        window2.geometry("125x50")
+        
+        w = tk.Label(window2, text="Copied!")
+        w.pack()
+        window2.after(750,lambda:window2.destroy())
+        myFrame = Frame(window2)
+        myFrame.pack(pady=20)
+
+        #CopyAcc = 'Copied'
+        #btn2.config(text="Copied")
+        #print(array[0][2])
+        
 
     # Copy password #########################################################
     def copyPass(input):
         window.clipboard_clear()
+
+        token = input
+        decryptedPassword = password_decrypt(token, password_to_encrypt).decode()
+        input = decryptedPassword
         window.clipboard_append(input)
+
+        window2 = Tk()
+        window2.geometry("125x50")
+        
+        w = tk.Label(window2, text="Copied!")
+        w.pack()
+        window2.after(750,lambda:window2.destroy())
+        myFrame = Frame(window2)
+        myFrame.pack(pady=20)
+
         
     # Creating a notepad ####################################################
     def makeNotepad(input):
@@ -305,7 +336,7 @@ def vaultScreen():
             lbl2.grid(column=1, row=i + 3)
             lbl3 = Label(second_frame, text="*****") 
             lbl3.grid(column=2, row=i + 3)
-            btn2 = Button(second_frame, text="Copy Acc", command=partial(copyAcc, array[i][2]))
+            btn2 = Button(second_frame, text=CopyAcc, command=partial(copyAcc, array[i][2]))
             btn2.grid(column=3, row=i + 3, pady=10)
             btn3 = Button(second_frame, text="Copy Pass", command=partial(copyPass, array[i][3]))
             btn3.grid(column=4, row=i + 3, pady=10)
