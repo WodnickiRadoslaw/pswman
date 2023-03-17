@@ -9,7 +9,6 @@ import tkinter as tk
 
 from passwordDBencrypting import password_encrypt, password_decrypt
 
-CopyAcc = 'Copy acc'
 # Creating new masterpassword - user identification ####################
 with sqlite3.connect("dbMain.db") as db:
     cursor = db.cursor()
@@ -115,7 +114,7 @@ def loginScreen():
     btn = Button(window, text="Submit", command=checkPassword)
     btn.pack(pady=2)
 
-
+# Making global function to select masterpassword from database
 password_to_encrypt = """SELECT password FROM masterpassword WHERE id = 1"""
 #   Main functionalities - creating main screen #############################
 def vaultScreen():
@@ -336,7 +335,7 @@ def vaultScreen():
             lbl2.grid(column=1, row=i + 3)
             lbl3 = Label(second_frame, text="*****") 
             lbl3.grid(column=2, row=i + 3)
-            btn2 = Button(second_frame, text=CopyAcc, command=partial(copyAcc, array[i][2]))
+            btn2 = Button(second_frame, text="Copy Acc", command=partial(copyAcc, array[i][2]))
             btn2.grid(column=3, row=i + 3, pady=10)
             btn3 = Button(second_frame, text="Copy Pass", command=partial(copyPass, array[i][3]))
             btn3.grid(column=4, row=i + 3, pady=10)
