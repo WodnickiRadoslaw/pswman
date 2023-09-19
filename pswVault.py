@@ -259,7 +259,6 @@ def vaultScreen():
         # Updating the data to DB ###########################################
         def retrieve_input(input):
             note = T.get("1.0",'end-1c').format(42)
-            #note = str(T.get("1.0",'end-1c'))
             Fact=cursor.execute("UPDATE vault SET notes = ? WHERE id = ?", (note, input,))
             Fact=cursor.fetchone()
             db.commit()
